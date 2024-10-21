@@ -1,0 +1,8 @@
+[package]
+name = "rust_distance_joint_simulator"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bevy = { version = "0.8.0"}
+syn = { version = "2.0.82", features = ["full"] }
