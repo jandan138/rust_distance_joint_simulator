@@ -1,3 +1,5 @@
+//src\main.rs
+
 use bevy::prelude::*;
 use bevy::window::WindowPlugin;
 
