@@ -1,6 +1,7 @@
 use bevy::prelude::*;
+use bevy::ecs::bundle::Bundle;
 
-// 定义一个代表立方体的结构体
+// 定义Cuboid结构体
 #[derive(Component)]
 pub struct Cuboid {
     pub position: Vec3,
@@ -9,23 +10,30 @@ pub struct Cuboid {
 }
 
 impl Cuboid {
+    // 添加构造函数
     pub fn new(size: Vec3, position: Vec3, mass: f32) -> Self {
         Self { size, position, mass }
     }
-
-    pub fn update(&mut self, force: Vec3, delta_time: f32) {
-        // 简单的位移更新逻辑
-        let acceleration = force / self.mass;
-        let velocity = acceleration * delta_time;
-        self.position += velocity;
-    }
 }
 
+// CuboidBundle包括一个PbrBundle和Cuboid组件
 #[derive(Bundle)]
 pub struct CuboidBundle {
-    pub cuboid: Cuboid,
     #[bundle]
-    pub transform: TransformBundle,
-    pub material: Handle<StandardMaterial>,
-    pub mesh: Handle<Mesh>,
+    pub pbr_bundle: PbrBundle,
+    pub cuboid: Cuboid,
+}
+
+impl CuboidBundle {
+    pub fn new(cuboid: Cuboid, mesh: Handle<Mesh>, material: Handle<StandardMaterial>, transform: Transform) -> Self {
+        Self {
+            pbr_bundle: PbrBundle {
+                mesh,
+                material,
+                transform,
+                ..Default::default()
+            },
+            cuboid,
+        }
+    }
 }
