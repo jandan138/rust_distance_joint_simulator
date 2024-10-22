@@ -1,10 +1,24 @@
+// src/distance_joint.rs
+
+use bevy::prelude::*;
+use crate::cuboid::Cuboid;
+
+
+#[derive(Component)]
 pub struct DistanceJoint {
-    pub length: f32,
-    // 其他必要的字段
+    pub body_a: Entity, // 连接的第一个实体
+    pub body_b: Entity, // 连接的第二个实体
+    pub min_distance: f32, // 最小距离
+    pub max_distance: f32, // 最大距离
 }
 
 impl DistanceJoint {
-    pub fn enforce_constraint(&self, cuboid: &mut Cuboid) {
-        // 约束逻辑实现
+    pub fn new(body_a: Entity, body_b: Entity, min_distance: f32, max_distance: f32) -> Self {
+        Self {
+            body_a,
+            body_b,
+            min_distance,
+            max_distance,
+        }
     }
 }

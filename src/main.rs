@@ -4,6 +4,10 @@ use bevy::window::WindowPlugin;
 mod cuboid; // 声明 cuboid 模块
 use crate::cuboid::{Cuboid, CuboidBundle}; // 引入你定义的 Cuboid 和 CuboidBundle
 
+mod distance_joint; // 导入distance_joint模块
+use crate::distance_joint::DistanceJoint; // 导入DistanceJoint结构体
+
+
 fn main() {
     App::new()
         .insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1))) // 设置背景颜色为深色
@@ -73,4 +77,22 @@ fn setup(
      
  
      info!("黄色立方体已生成，位置: (5.0, 0.0, 0.0)");
+}
+
+pub fn maintain_distance_joints(
+    mut commands: Commands,
+    query: Query<(Entity, &DistanceJoint, &Transform)>,
+) {
+    for (entity, joint, transform) in query.iter() {
+        let transform_a = query.get_component::<Transform>(joint.body_a).unwrap();
+        let transform_b = query.get_component::<Transform>(joint.body_b).unwrap();
+
+        // 计算当前距离
+        let current_distance = transform_a.translation.distance(transform_b.translation);
+
+        // 根据距离调整实体位置
+        if current_distance < joint.min_distance || current_distance > joint.max_distance {
+            commands.entity(entity).insert(Transform::default()); // 示例：重置位置
+        }
+    }
 }
