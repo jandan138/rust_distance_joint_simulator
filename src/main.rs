@@ -1,3 +1,5 @@
+// src/main.rs
+
 use bevy::prelude::*;
 use bevy::window::WindowPlugin;
 
@@ -7,7 +9,7 @@ mod physics;
 mod rendering;
 
 use crate::cuboid::{Cuboid, CuboidBundle};
-use crate::distance_joint::DistanceJoint;
+use crate::distance_joint::{DistanceJoint, maintain_distance_joints};
 use crate::physics::{physics_step_system, PhysicsBody};
 use crate::rendering::{setup_rendering_environment, update_rendering};
 
@@ -25,21 +27,6 @@ fn main() {
         .add_startup_system(setup_rendering_environment)
         .add_system(physics_step_system)
         .add_system(update_rendering)
-        .add_system(maintain_distance_joints)
+        .add_system(maintain_distance_joints) // 使用 distance_joint.rs 中定义的系统
         .run();
-}
-
-pub fn maintain_distance_joints(
-    mut commands: Commands,
-    query: Query<(Entity, &DistanceJoint, &Transform)>
-) {
-    for (entity, joint, _transform) in query.iter() {
-        let transform_a = query.get_component::<Transform>(joint.body_a).unwrap();
-        let transform_b = query.get_component::<Transform>(joint.body_b).unwrap();
-
-        let current_distance = transform_a.translation.distance(transform_b.translation);
-        if current_distance < joint.min_distance || current_distance > joint.max_distance {
-            commands.entity(entity).insert(Transform::default());
-        }
-    }
 }
