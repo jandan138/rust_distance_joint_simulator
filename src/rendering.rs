@@ -2,6 +2,7 @@
 use bevy::prelude::*;
 use crate::cuboid::{Cuboid, CuboidBundle};
 use crate::physics::PhysicsBody;
+use crate::DistanceJoint;
 
 // Initialize the rendering environment including lights and camera
 pub fn setup_rendering_environment(
@@ -39,12 +40,14 @@ pub fn setup_rendering_environment(
         ..Default::default()
     });
     let red_cube_physics = PhysicsBody::new(1.0);
-    commands.spawn(PbrBundle {
+    let red_entity = commands.spawn(PbrBundle {
         mesh: red_cube_mesh,
         material: red_cube_material,
         transform: Transform::from_xyz(0.0, 0.0, 0.0),
         ..Default::default()
-    }).insert(red_cube_physics);
+    })
+    .insert(red_cube_physics)
+    .id();
 
     // Create a yellow cuboid
     let yellow_cube_mesh = meshes.add(Mesh::from(shape::Cube { size: 2.0 }));
@@ -55,9 +58,21 @@ pub fn setup_rendering_environment(
     let yellow_cuboid = Cuboid::new(Vec3::new(2.0, 2.0, 2.0), Vec3::new(3.0, 0.0, 0.0), 1.0);
     let yellow_cube_transform = Transform::from_xyz(5.0, 0.0, 0.0);
     let yellow_cube_physics = PhysicsBody::new(1.0);
-    commands.spawn(CuboidBundle::new(yellow_cuboid, yellow_cube_mesh, yellow_cube_material, yellow_cube_transform))
-        .insert(yellow_cube_physics);
+    let yellow_entity = commands.spawn(CuboidBundle::new(yellow_cuboid, yellow_cube_mesh, yellow_cube_material, yellow_cube_transform))
+    .insert(yellow_cube_physics)
+    .id();
+
+    //Add DistanceJoint between red and yellow cuboids
+    commands.entity(red_entity).insert(DistanceJoint {
+    body_a: red_entity,
+    body_b: yellow_entity,
+    min_distance: 1.0, // Minimum distance between cubes
+    max_distance: 3.0, // Maximum distance between cubes
+    });
+    
 }
+
+
 
 // Update rendering based on physics and Cuboid components
 pub fn update_rendering(

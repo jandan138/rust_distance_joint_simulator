@@ -26,7 +26,9 @@ fn main() {
         }))
         .add_startup_system(setup_rendering_environment)
         .add_system(physics_step_system)
+        .add_system(maintain_distance_joints.before(physics_step_system)) // 确保在物理系统之前执行
         .add_system(update_rendering)
-        .add_system(maintain_distance_joints) // 使用 distance_joint.rs 中定义的系统
         .run();
+
+    println!("维持距离约束系统已添加并预计将执行");
 }

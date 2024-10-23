@@ -40,14 +40,18 @@ impl PhysicsBody {
 // 物理步进系统更新每个物体的状态
 pub fn physics_step_system(
     time: Res<Time>, 
-    mut query: Query<(&mut Transform, &mut PhysicsBody)>
+    mut query: Query<(Entity, &mut Transform, &mut PhysicsBody)>
 ) {
-    for (mut transform, mut physics) in query.iter_mut() {
+    for (entity, mut transform, mut physics) in query.iter_mut() {
         let mass = physics.mass;  // 先复制质量到局部变量
         physics.apply_force(GRAVITY * mass);  // 使用局部变量计算新力
-        physics.update_physics(time.delta_seconds()); // 更新物理状态
+        //physics.update_physics(time.delta_seconds()); // 更新物理状态
 
+        // 在应用物理计算后更新位置
         transform.translation += physics.velocity * time.delta_seconds();
+
+        // 输出调试信息
+        println!("Entity: {:?}, Position: {:?}, Velocity: {:?}, Mass: {}", entity, transform.translation, physics.velocity, mass);
     }
 }
 
