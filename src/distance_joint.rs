@@ -51,8 +51,8 @@ pub fn maintain_distance_joints(
                     * (current_distance - (joint.min_distance + joint.max_distance) / 2.0);
                 println!("应用的校正: {}", correction);  // 输出应用的位置校正向量
 
-                corrections.push((joint.body_a, transform_a.translation - correction));
-                corrections.push((joint.body_b, transform_b.translation + correction));
+                corrections.push((joint.body_a, transform_a.translation + correction));
+                corrections.push((joint.body_b, transform_b.translation - correction));
             }
         }
     }

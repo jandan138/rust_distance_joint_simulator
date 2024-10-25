@@ -4,7 +4,7 @@ use bevy::prelude::*;
 use bevy::ecs::system::Res;
 
 // 定义重力向量，假设重力作用在Z轴负方向
-const GRAVITY: Vec3 = Vec3::new(0.0, 0.0, -9.81);
+const GRAVITY: Vec3 = Vec3::new(0.0, 0.0, -1.81);
 
 // PhysicsBody 组件存储速度、力和质量
 #[derive(Component)]
@@ -44,14 +44,16 @@ pub fn physics_step_system(
 ) {
     for (entity, mut transform, mut physics) in query.iter_mut() {
         let mass = physics.mass;  // 先复制质量到局部变量
+        println!("更新前的Entity: {:?}, Position: {:?}, Velocity: {:?}, Mass: {}", entity, transform.translation, physics.velocity, mass);
         physics.apply_force(GRAVITY * mass);  // 使用局部变量计算新力
-        //physics.update_physics(time.delta_seconds()); // 更新物理状态
+        physics.update_physics(time.delta_seconds()); // 更新物理状态
 
         // 在应用物理计算后更新位置
-        transform.translation += physics.velocity * time.delta_seconds();
+        let delta_transform = physics.velocity * time.delta_seconds();
+        transform.translation += delta_transform;
 
         // 输出调试信息
-        println!("Entity: {:?}, Position: {:?}, Velocity: {:?}, Mass: {}", entity, transform.translation, physics.velocity, mass);
+        println!("更新后的Entity: {:?}, Position: {:?}, Velocity: {:?}, Mass: {}, 时间的变化量：{}, 位置的变化量:{:?}", entity, transform.translation, physics.velocity, mass, time.delta_seconds(), delta_transform);
     }
 }
 

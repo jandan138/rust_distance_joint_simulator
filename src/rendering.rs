@@ -55,7 +55,7 @@ pub fn setup_rendering_environment(
         base_color: Color::rgb(1.0, 1.0, 0.0),
         ..Default::default()
     });
-    let yellow_cuboid = Cuboid::new(Vec3::new(2.0, 2.0, 2.0), Vec3::new(3.0, 0.0, 0.0), 1.0);
+    let yellow_cuboid = Cuboid::new(Vec3::new(2.0, 2.0, 2.0), Vec3::new(6.0, 0.0, 0.0), 1.0);
     let yellow_cube_transform = Transform::from_xyz(5.0, 0.0, 0.0);
     let yellow_cube_physics = PhysicsBody::new(1.0);
     let yellow_entity = commands.spawn(CuboidBundle::new(yellow_cuboid, yellow_cube_mesh, yellow_cube_material, yellow_cube_transform))
@@ -67,7 +67,7 @@ pub fn setup_rendering_environment(
     body_a: red_entity,
     body_b: yellow_entity,
     min_distance: 1.0, // Minimum distance between cubes
-    max_distance: 3.0, // Maximum distance between cubes
+    max_distance: 5.0, // Maximum distance between cubes
     });
     
 }
@@ -81,10 +81,10 @@ pub fn update_rendering(
 ) {
     for (mut transform, physics, cuboid, mut material_handle) in query.iter_mut() {
         // Update position
-        transform.translation += physics.velocity; // Update position based on velocity
+        //transform.translation += physics.velocity; // Update position based on velocity
 
         // Optionally adjust mesh size or material properties based on Cuboid properties
         let material = materials.get_mut(&material_handle).unwrap();
-        material.base_color = Color::rgb(0.5, 0.5, 1.0);  // Example: change color based on dynamics
+        //material.base_color = Color::rgb(0.5, 0.5, 1.0);  // Example: change color based on dynamics
     }
 }
