@@ -26,7 +26,7 @@ impl DistanceJoint {
 // 维持距离约束的系统
 pub fn maintain_distance_joints(
     mut commands: Commands,
-    query: Query<(Entity, &DistanceJoint, &Transform, &PhysicsBody)>,
+    mut query: Query<(Entity, &DistanceJoint, &Transform, &PhysicsBody)>,
     transform_query: Query<&Transform>,
 ) {
     let mut corrections: Vec<(Entity, Vec3)> = Vec::new();
@@ -51,12 +51,46 @@ pub fn maintain_distance_joints(
                 corrections.push((joint.body_a, transform_a.translation - correction * 0.5));
                 corrections.push((joint.body_b, transform_b.translation + correction * 0.5));
             } else if current_distance > joint.max_distance {
+                println!("进入限制两者最大距离的判断");  
                 let correction = direction * (current_distance - joint.max_distance);
-                corrections.push((joint.body_a, transform_a.translation + correction * 0.5));
-                corrections.push((joint.body_b, transform_b.translation - correction * 0.5));
+                // corrections.push((joint.body_a, transform_a.translation + correction * 0.5));
+                // corrections.push((joint.body_b, transform_b.translation - correction * 0.5));
+                if physics.is_fixed {
+                    corrections.push((joint.body_b, transform_b.translation - correction));
+                } else {
+                    corrections.push((joint.body_a, transform_a.translation - correction * 0.5));
+                    corrections.push((joint.body_b, transform_b.translation + correction * 0.5));
+                }
+
             }
         }
     }
+    // for (entity, joint, transform, physics) in query.iter_mut() {
+    //     let transform_a = transform_query.get(joint.body_a).expect("Failed to get Transform for body_a");
+    //     let transform_b = transform_query.get(joint.body_b).expect("Failed to get Transform for body_b");
+    //     let physics_a = query.get_component::<PhysicsBody>(joint.body_a).expect("Failed to get PhysicsBody for body_a");
+    //     let physics_b = query.get_component::<PhysicsBody>(joint.body_b).expect("Failed to get PhysicsBody for body_b");
+
+    //     let current_distance = transform_a.translation.distance(transform_b.translation);
+    //     let direction = (transform_b.translation - transform_a.translation).normalize();
+
+    //     if current_distance < joint.min_distance || current_distance > joint.max_distance {
+    //         let correction = if current_distance < joint.min_distance {
+    //             direction * (joint.min_distance - current_distance)
+    //         } else {
+    //             direction * (current_distance - joint.max_distance)
+    //         };
+
+            // if physics_a.is_fixed {
+            //     corrections.push((joint.body_b, transform_b.translation + correction));
+            // } else if physics_b.is_fixed {
+            //     corrections.push((joint.body_a, transform_a.translation - correction));
+            // } else {
+            //     corrections.push((joint.body_a, transform_a.translation - correction * 0.5));
+            //     corrections.push((joint.body_b, transform_b.translation + correction * 0.5));
+            // }
+    //     }
+    // }
 
     // 应用所有修正
     for (entity, new_translation) in corrections {
@@ -72,48 +106,4 @@ pub fn maintain_distance_joints(
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-// pub fn maintain_distance_joints(
-//     mut commands: Commands,
-//     query: Query<(Entity, &DistanceJoint, &Transform, &PhysicsBody)>
-// ) {
-//     let mut corrections: Vec<(Entity, Vec3)> = Vec::new();
-
-//     for (entity, joint, transform, physics) in query.iter() {
-//         let transform_a = query.get_component::<Transform>(joint.body_a).unwrap();
-//         let transform_b = query.get_component::<Transform>(joint.body_b).unwrap();
-
-//         //let current_distance = transform_a.translation.distance(transform_b.translation);
-//         //println!("当前距离: {}", current_distance);  // 输出当前两个实体之间的距离
-//         println!("设定的最小距离: {}", joint.min_distance);  // 输出设定的最小距离
-//         println!("设定的最大距离: {}", joint.max_distance);  // 输出设定的最大距离
-
-//         // if current_distance < joint.min_distance || current_distance > joint.max_distance {
-//         //     let correction = (transform_b.translation - transform_a.translation).normalize() * (current_distance - (joint.min_distance + joint.max_distance) / 2.0);
-//         //     println!("应用的校正: {}", correction);  // 输出应用的位置校正向量
-
-//         //     corrections.push((joint.body_a, transform_a.translation - correction));
-//         //     corrections.push((joint.body_b, transform_b.translation + correction));
-//         // }
-//     }
-
-//     // 应用所有修正
-//     // for (entity, new_translation) in corrections {
-//     //     commands.entity(entity).insert(Transform {
-//     //         translation: new_translation,
-//     //         ..Default::default()
-//     //     });
-//     // }
-// }
 
