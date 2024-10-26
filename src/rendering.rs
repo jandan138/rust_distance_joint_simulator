@@ -39,7 +39,9 @@ pub fn setup_rendering_environment(
         base_color: Color::rgb(1.0, 0.0, 0.0),
         ..Default::default()
     });
-    let red_cube_physics = PhysicsBody::new(1.0);
+    //let red_cube_physics = PhysicsBody::new(1.0);
+    let mut red_cube_physics = PhysicsBody::new_with_velocity(1.0, Vec3::new(0.0, 0.0, 0.0));//用这个带速度的物理体初始化
+    red_cube_physics.is_fixed = true;
     let red_entity = commands.spawn(PbrBundle {
         mesh: red_cube_mesh,
         material: red_cube_material,
@@ -49,7 +51,6 @@ pub fn setup_rendering_environment(
     .insert(red_cube_physics)
     .id();
 
-    // Create a yellow cuboid
     let yellow_cube_mesh = meshes.add(Mesh::from(shape::Cube { size: 2.0 }));
     let yellow_cube_material = materials.add(StandardMaterial {
         base_color: Color::rgb(1.0, 1.0, 0.0),
@@ -66,7 +67,7 @@ pub fn setup_rendering_environment(
     commands.entity(red_entity).insert(DistanceJoint {
     body_a: red_entity,
     body_b: yellow_entity,
-    min_distance: 1.0, // Minimum distance between cubes
+    min_distance: 2.0, // Minimum distance between cubes
     max_distance: 5.0, // Maximum distance between cubes
     });
     

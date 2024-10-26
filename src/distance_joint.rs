@@ -45,14 +45,15 @@ pub fn maintain_distance_joints(
             println!("设定的最小距离: {}", joint.min_distance);  // 输出设定的最小距离
             println!("设定的最大距离: {}", joint.max_distance);  // 输出设定的最大距离
 
-            // 如果当前距离超出设定的范围，进行校正
-            if current_distance < joint.min_distance || current_distance > joint.max_distance {
-                let correction = (transform_b.translation - transform_a.translation).normalize()
-                    * (current_distance - (joint.min_distance + joint.max_distance) / 2.0);
-                println!("应用的校正: {}", correction);  // 输出应用的位置校正向量
-
-                corrections.push((joint.body_a, transform_a.translation + correction));
-                corrections.push((joint.body_b, transform_b.translation - correction));
+            let direction = (transform_b.translation - transform_a.translation).normalize();
+            if current_distance < joint.min_distance {
+                let correction = direction * (joint.min_distance - current_distance);
+                corrections.push((joint.body_a, transform_a.translation - correction * 0.5));
+                corrections.push((joint.body_b, transform_b.translation + correction * 0.5));
+            } else if current_distance > joint.max_distance {
+                let correction = direction * (current_distance - joint.max_distance);
+                corrections.push((joint.body_a, transform_a.translation + correction * 0.5));
+                corrections.push((joint.body_b, transform_b.translation - correction * 0.5));
             }
         }
     }
