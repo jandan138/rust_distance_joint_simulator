@@ -46,6 +46,12 @@ impl PhysicsBody {
         let acceleration = self.force / self.mass; // F = ma, a = F/m
         self.velocity += acceleration * delta_time;
         self.force = Vec3::ZERO; // 重置力，准备下一帧的计算
+    }
+
+    // 清除沿指定方向的速度分量
+    pub fn cancel_velocity_along(&mut self, direction: Vec3) {
+        let velocity_along = self.velocity.dot(direction) * direction;
+        self.velocity -= velocity_along;
     }    
 }
 

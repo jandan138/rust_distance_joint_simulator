@@ -28,11 +28,12 @@ pub fn maintain_distance_joints(
     mut commands: Commands,
     mut query: Query<(Entity, &DistanceJoint, &Transform, &PhysicsBody)>,
     transform_query: Query<&Transform>,
+    physics_query: Query<&PhysicsBody>
 ) {
     let mut corrections: Vec<(Entity, Vec3)> = Vec::new();
 
     // 遍历所有包含 DistanceJoint、Transform 和 PhysicsBody 的实体
-    for (entity, joint, transform, physics) in query.iter() {
+    for (entity, mut joint, transform, mut physics) in query.iter() {
         // 使用 transform_query 分别获取 body_a 和 body_b 的 Transform 组件
         let transform_a = transform_query.get(joint.body_a);
         let transform_b = transform_query.get(joint.body_b);
@@ -53,16 +54,19 @@ pub fn maintain_distance_joints(
             } else if current_distance > joint.max_distance {
                 println!("进入限制两者最大距离的判断");  
                 let correction = direction * (current_distance - joint.max_distance);
-                // corrections.push((joint.body_a, transform_a.translation + correction * 0.5));
-                // corrections.push((joint.body_b, transform_b.translation - correction * 0.5));
                 if physics.is_fixed {
                     corrections.push((joint.body_b, transform_b.translation - correction));
                 } else {
-                    corrections.push((joint.body_a, transform_a.translation - correction * 0.5));
-                    corrections.push((joint.body_b, transform_b.translation + correction * 0.5));
+                    corrections.push((joint.body_a, transform_a.translation + correction * 0.5));
+                    corrections.push((joint.body_b, transform_b.translation - correction * 0.5));
                 }
-
             }
+            // if current_distance > joint.max_distance {
+            //     let direction = (transform_b.translation - transform_a.translation).normalize();
+            //     //joint.body_a.physics.cancel_velocity_along(direction);
+            //     physics.cancel_velocity_along(direction);
+            // }
+
         }
     }
     // for (entity, joint, transform, physics) in query.iter_mut() {

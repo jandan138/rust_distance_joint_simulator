@@ -7,11 +7,14 @@ mod cuboid;
 mod distance_joint;
 mod physics;
 mod rendering;
+mod simulation;
 
 use crate::cuboid::{Cuboid, CuboidBundle};
 use crate::distance_joint::{DistanceJoint, maintain_distance_joints};
 use crate::physics::{physics_step_system, PhysicsBody};
+use crate::simulation::{simulation_step_system};
 use crate::rendering::{setup_rendering_environment, update_rendering};
+
 
 fn main() {
     App::new()
@@ -26,6 +29,7 @@ fn main() {
         }))
         .add_startup_system(setup_rendering_environment)
         .add_system(physics_step_system)
+        .add_system(simulation_step_system)
         .add_system(maintain_distance_joints.before(physics_step_system)) // 确保在物理系统之前执行
         .add_system(update_rendering)
         .run();
