@@ -30,7 +30,7 @@ fn main() {
         .add_startup_system(setup_rendering_environment)
         .add_system(physics_step_system)
         .add_system(simulation_step_system)
-        .add_system(maintain_distance_joints.before(physics_step_system)) // 确保在物理系统之前执行
+        //.add_system(maintain_distance_joints.before(physics_step_system)) // 确保在物理系统之前执行
         .add_system(update_rendering)
         .run();
 

@@ -16,6 +16,9 @@ pub fn simulation_step_system(
         if !physics.is_fixed {
             transform.translation += physics.velocity * time.delta_seconds();
         }
+        else if (physics.is_fixed) {
+            physics.velocity = Vec3::ZERO;
+        }
 
         // 输出调试信息
         println!("更新后的Entity: {:?}, Position: {:?}, Velocity: {:?}, Mass: {}, 时间的变化量：{}, 位置的变化量:{:?}", entity, transform.translation, physics.velocity, mass, time.delta_seconds(), delta_transform);

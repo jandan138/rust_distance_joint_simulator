@@ -13,16 +13,28 @@ pub struct PhysicsBody {
     pub force: Vec3,          // 当前作用的总力
     pub mass: f32,            // 质量
     pub is_fixed: bool,  // 新增属性，确定是否固定位置
+    pub predicted_position: Vec3, //
 }
 
 impl PhysicsBody {
     // 创建一个新的 PhysicsBody 实例
+    pub fn new_PhysicsBody(mass: f32, initial_velocity: Vec3, initial_force: Vec3, initial_predicted_position: Vec3, while_fixed: bool) -> Self {
+        Self {
+            velocity: initial_velocity,
+            force: initial_force,
+            mass,
+            is_fixed : while_fixed,  // 设置是否固定
+            predicted_position: initial_predicted_position,
+        }
+    }
+    
     pub fn new(mass: f32) -> Self {
         Self {
             velocity: Vec3::ZERO,           // 初始化速度为零
             force: Vec3::ZERO,              // 初始化力为零
             mass,
             is_fixed : false,
+            predicted_position: Vec3::ZERO,
         }
     }
     // 创建一个新的 PhysicsBody 实例，带有指定的初始速度
@@ -32,6 +44,7 @@ impl PhysicsBody {
             force: Vec3::ZERO,
             mass,
             is_fixed : false,  // 设置是否固定
+            predicted_position: Vec3::ZERO,
         }
     }
 
@@ -55,7 +68,7 @@ impl PhysicsBody {
     }    
 }
 
-// 物理步进系统更新每个物体的状态
+// 物理步进系统更新每个物体的状态,但是不包括最终的位置
 pub fn physics_step_system(
     time: Res<Time>, 
     mut query: Query<(Entity, &mut Transform, &mut PhysicsBody)>
@@ -73,8 +86,8 @@ pub fn physics_step_system(
             transform.translation += physics.velocity * time.delta_seconds();
         }
 
-        // 输出调试信息
-        println!("更新后的Entity: {:?}, Position: {:?}, Velocity: {:?}, Mass: {}, 时间的变化量：{}, 位置的变化量:{:?}", entity, transform.translation, physics.velocity, mass, time.delta_seconds(), delta_transform);
+        // // 输出调试信息
+        // println!("更新后的Entity: {:?}, Position: {:?}, Velocity: {:?}, Mass: {}, 时间的变化量：{}, 位置的变化量:{:?}", entity, transform.translation, physics.velocity, mass, time.delta_seconds(), delta_transform);
     }
 }
 

@@ -40,8 +40,13 @@ pub fn setup_rendering_environment(
         ..Default::default()
     });
     //let red_cube_physics = PhysicsBody::new(1.0);
-    let mut red_cube_physics = PhysicsBody::new_with_velocity(1.0, Vec3::new(-2.0, 0.0, 0.0));//用这个带速度的物理体初始化
-    red_cube_physics.is_fixed = true;//把红块的物理属性 设为静止
+    //let mut red_cube_physics = PhysicsBody::new_with_velocity(1.0, Vec3::new(-2.0, 0.0, 0.0));//用这个带速度的物理体初始化
+    let mut red_cube_physics = PhysicsBody::new_PhysicsBody(1.0, 
+        Vec3::new(-2.0, 0.0, 0.0), 
+        Vec3::new(0.0, 0.0, 0.0), 
+        Vec3::new(0.0, 0.0, 0.0), 
+        true);
+    //red_cube_physics.is_fixed = true;//把红块的物理属性 设为静止
     let red_entity = commands.spawn(PbrBundle {
         mesh: red_cube_mesh,
         material: red_cube_material,
