@@ -83,7 +83,8 @@ pub fn physics_step_system(
         let delta_transform = physics.velocity * time.delta_seconds() ;
         // 仅当 is_fixed 为 false 时更新位置
         if !physics.is_fixed {
-            transform.translation += physics.velocity * time.delta_seconds();
+            //transform.translation += physics.velocity * time.delta_seconds();
+            physics.predicted_position += delta_transform;
         }
 
         // // 输出调试信息

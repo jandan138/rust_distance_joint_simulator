@@ -63,7 +63,12 @@ pub fn setup_rendering_environment(
     });
     let yellow_cuboid = Cuboid::new(Vec3::new(2.0, 2.0, 2.0), Vec3::new(6.0, 0.0, 0.0), 1.0);
     let yellow_cube_transform = Transform::from_xyz(5.0, 0.0, 0.0);
-    let yellow_cube_physics = PhysicsBody::new(1.0);
+    //let yellow_cube_physics = PhysicsBody::new(1.0);
+    let mut yellow_cube_physics = PhysicsBody::new_PhysicsBody(1.0, 
+        Vec3::new(1.0, 0.0, 0.0), 
+        Vec3::new(0.0, 0.0, 0.0), 
+        Vec3::new(5.0, 0.0, 0.0), 
+        false);
     let yellow_entity = commands.spawn(CuboidBundle::new(yellow_cuboid, yellow_cube_mesh, yellow_cube_material, yellow_cube_transform))
     .insert(yellow_cube_physics)
     .id();
