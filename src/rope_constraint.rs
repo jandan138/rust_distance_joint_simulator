@@ -1,48 +1,64 @@
-// src/rope_constraint.rs
-
 use bevy::prelude::*;
 use crate::cuboid::Cuboid;
 use crate::physics::PhysicsBody;
 
 #[derive(Component)]
 pub struct RopeConstraint {
-    pub physics_body_a: PhysicsBody, // 连接的第一个实体
-    pub physics_body_b: PhysicsBody, // 连接的第二个实体
-    //pub min_distance: f32, // 最小距离
+    pub body_a: Entity, // 连接的第一个实体
+    pub body_b: Entity, // 连接的第二个实体
     pub max_distance: f32, // 绳子最大长度
 }
 
-//设置全局的绳子长度约束数组
-#[derive(Resource)]
-struct RopeConstraints {
-    constraints: Vec<RopeConstraint>,
+#[derive(Resource, Default)]
+pub struct RopeConstraints {
+    pub constraints: Vec<RopeConstraint>,
 }
 
 impl RopeConstraint {
-    pub fn new(physics_body_a: PhysicsBody, physics_body_b: PhysicsBody, max_distance: f32) -> Self {
+    pub fn new(body_a: Entity, body_b: Entity, max_distance: f32) -> Self {
         Self {
-            physics_body_a,
-            physics_body_b,
+            body_a,
+            body_b,
             max_distance,
         }
     }
 }
 
 // 维持距离约束的系统
-pub fn maintain_rope_constraints(mut constraints: ResMut<RopeConstraints>) 
-{
-    //遍历一个全局RopeConstraint的数组 对于里面每个RopeConstraint，如果他们距离physics_body_a, physics_body_b 的predicted_position的差值超过绳子最大长度 ，
-    //修改其中的每个            physics_body_a, physics_body_b的velocity, 把他们沿绳子方向的速度变为零
-    let mut physics_body_a = constraints.physics_body_a;
-    let mut physics_body_b = constraints.physics_body_b;
-    
-    let direction = (physics_body_a.predicted_position - physics_body_a.predicted_position).normalize();//b->a的单位向量
+pub fn maintain_rope_constraints(
+    mut constraints: ResMut<RopeConstraints>,
+    mut query_set: ParamSet<(
+        Query<&mut PhysicsBody>, 
+        Query<&mut PhysicsBody>
+    )>,
+) {
+    for constraint in constraints.constraints.iter() {
+        // 首先获取 `body_a` 的 PhysicsBody
+        let position_a;
+        {
+            let mut p0 = query_set.p0(); // 获取 `p0` 的查询
+            let physics_a = p0.get_mut(constraint.body_a).unwrap();
+            position_a = physics_a.predicted_position; // 获取位置
+        } // `p0` 在这里释放，确保没有冲突
 
-    physics_a.cancel_velocity_along(direction);
-    physics_b.cancel_velocity_along(direction);
-    // 应用所有修正
+        // 然后获取 `body_b` 的 PhysicsBody
+        let position_b;
+        {
+            let mut p1 = query_set.p1(); // 获取 `p1` 的查询
+            let physics_b = p1.get_mut(constraint.body_b).unwrap();
+            position_b = physics_b.predicted_position; // 获取位置
+        } // `p1` 在这里释放
 
+        // 再次获取可变引用以进行修改
+        let direction = (position_b - position_a).normalize();
+        let distance = position_a.distance(position_b);
+
+        if distance > constraint.max_distance {
+            // 如果距离超过最大值，则限制物体的速度
+            query_set.p0().get_mut(constraint.body_a).unwrap().cancel_velocity_along(direction);
+            query_set.p1().get_mut(constraint.body_b).unwrap().cancel_velocity_along(direction);
+        }
+    }
 }
-
 
 

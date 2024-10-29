@@ -4,7 +4,7 @@ use bevy::prelude::*;
 use bevy::ecs::system::Res;
 
 // 定义重力向量，假设重力作用在Z轴负方向
-const GRAVITY: Vec3 = Vec3::new(0.0, 0.0, -1.1);
+const GRAVITY: Vec3 = Vec3::new(0.0, 0.0, -9.1);
 
 // PhysicsBody 组件存储速度、力和质量
 #[derive(Component)]
@@ -14,6 +14,7 @@ pub struct PhysicsBody {
     pub mass: f32,            // 质量
     pub is_fixed: bool,  // 新增属性，确定是否固定位置
     pub predicted_position: Vec3, //
+    pub last_position: Vec3,
 }
 
 impl PhysicsBody {
@@ -25,6 +26,7 @@ impl PhysicsBody {
             mass,
             is_fixed : while_fixed,  // 设置是否固定
             predicted_position: initial_predicted_position,
+            last_position: initial_predicted_position
         }
     }
     
@@ -35,6 +37,7 @@ impl PhysicsBody {
             mass,
             is_fixed : false,
             predicted_position: Vec3::ZERO,
+            last_position: Vec3::ZERO,
         }
     }
     // 创建一个新的 PhysicsBody 实例，带有指定的初始速度
@@ -45,6 +48,7 @@ impl PhysicsBody {
             mass,
             is_fixed : false,  // 设置是否固定
             predicted_position: Vec3::ZERO,
+            last_position: Vec3::ZERO,
         }
     }
 
@@ -65,6 +69,12 @@ impl PhysicsBody {
     pub fn cancel_velocity_along(&mut self, direction: Vec3) {
         let velocity_along = self.velocity.dot(direction) * direction;
         self.velocity -= velocity_along;
+    }
+
+    //从last position更新predicted position
+    pub fn update_predicted_position(&mut self, delta_time: f32) {
+        //self.last_position = self.predicted_position;
+        self.predicted_position = self.last_position + delta_time * self.velocity;
     }    
 }
 
@@ -73,22 +83,26 @@ pub fn physics_step_system(
     time: Res<Time>, 
     mut query: Query<(Entity, &mut Transform, &mut PhysicsBody)>
 ) {
+
     for (entity, mut transform, mut physics) in query.iter_mut() {
         let mass = physics.mass;  // 先复制质量到局部变量
-        println!("更新前的Entity: {:?}, Position: {:?}, Velocity: {:?}, Mass: {}", entity, transform.translation, physics.velocity, mass);
+        //println!("更新前的Entity: {:?}, Position: {:?}, Velocity: {:?}, Mass: {}", entity, transform.translation, physics.velocity, mass);
         physics.apply_force(GRAVITY * mass);  // 使用局部变量计算新力
         physics.update_physics(time.delta_seconds()); // 更新物理状态
-
+        physics.last_position = transform.translation;
         // 在应用物理计算后更新位置
-        let delta_transform = physics.velocity * time.delta_seconds() ;
+        //physics.last_position = physics.predicted_position;
+        //let delta_transform = physics.velocity * time.delta_seconds() ;
         // 仅当 is_fixed 为 false 时更新位置
         if !physics.is_fixed {
             //transform.translation += physics.velocity * time.delta_seconds();
-            physics.predicted_position += delta_transform;
+            //physics.predicted_position += delta_transform;
+            physics.update_predicted_position(time.delta_seconds());
         }
 
         // // 输出调试信息
-        // println!("更新后的Entity: {:?}, Position: {:?}, Velocity: {:?}, Mass: {}, 时间的变化量：{}, 位置的变化量:{:?}", entity, transform.translation, physics.velocity, mass, time.delta_seconds(), delta_transform);
+         println!("physics中更新后的Entity: {:?}, Position: {:?}, Velocity: {:?}, Mass: {}, 时间的变化量：{}, 位置的变化量:{:?}", 
+         entity, transform.translation, physics.velocity, mass, time.delta_seconds(), transform.translation - physics.last_position);
     }
 }
 

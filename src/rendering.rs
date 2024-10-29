@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use crate::cuboid::{Cuboid, CuboidBundle};
 use crate::physics::PhysicsBody;
 use crate::DistanceJoint;
+use crate::rope_constraint::{RopeConstraint, RopeConstraints, maintain_rope_constraints};
 
 // Initialize the rendering environment including lights and camera
 pub fn setup_rendering_environment(
@@ -80,6 +81,20 @@ pub fn setup_rendering_environment(
     min_distance: 2.0, // Minimum distance between cubes
     max_distance: 5.0, // Maximum distance between cubes
     });
+
+    //加这个绳子的约束系统
+    commands.insert_resource(RopeConstraints::default());
+    // 创建 RopeConstraint 并添加到全局资源中
+    let rope_constraint = RopeConstraint {
+        body_a: red_entity,
+        body_b: yellow_entity,
+        max_distance: 5.0,
+    };
+    // 获取并修改 RopeConstraints 资源来添加新的绳子约束
+    commands.insert_resource(RopeConstraints {
+        constraints: vec![rope_constraint] // 这里假设 `rope_constraint` 已经创建好了
+    });
+    
     
 }
 
