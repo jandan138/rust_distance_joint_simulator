@@ -4,6 +4,7 @@ use crate::cuboid::{Cuboid, CuboidBundle};
 use crate::physics::PhysicsBody;
 use crate::DistanceJoint;
 use crate::rope_constraint::{RopeConstraint, RopeConstraints, maintain_rope_constraints};
+use crate::entity_creators::create_cuboid_entity;
 
 // Initialize the rendering environment including lights and camera
 pub fn setup_rendering_environment(
@@ -34,45 +35,31 @@ pub fn setup_rendering_environment(
         ..default()
     });
 
-    // Create a red cuboid
-    let red_cube_mesh = meshes.add(Mesh::from(shape::Cube { size: 2.0 }));
-    let red_cube_material = materials.add(StandardMaterial {
-        base_color: Color::rgb(1.0, 0.0, 0.0),
-        ..Default::default()
-    });
-    //let red_cube_physics = PhysicsBody::new(1.0);
-    //let mut red_cube_physics = PhysicsBody::new_with_velocity(1.0, Vec3::new(-2.0, 0.0, 0.0));//用这个带速度的物理体初始化
-    let mut red_cube_physics = PhysicsBody::new_PhysicsBody(1.0, 
-        Vec3::new(-2.0, 0.0, 0.0), 
-        Vec3::new(0.0, 0.0, 0.0), 
-        Vec3::new(0.0, 0.0, 0.0), 
-        true);
-    //red_cube_physics.is_fixed = true;//把红块的物理属性 设为静止
-    let red_entity = commands.spawn(PbrBundle {
-        mesh: red_cube_mesh,
-        material: red_cube_material,
-        transform: Transform::from_xyz(0.0, 0.0, 0.0),
-        ..Default::default()
-    })
-    .insert(red_cube_physics)
-    .id();
 
-    let yellow_cube_mesh = meshes.add(Mesh::from(shape::Cube { size: 2.0 }));
-    let yellow_cube_material = materials.add(StandardMaterial {
-        base_color: Color::rgb(1.0, 1.0, 0.0),
-        ..Default::default()
-    });
-    let yellow_cuboid = Cuboid::new(Vec3::new(2.0, 2.0, 2.0), Vec3::new(6.0, 0.0, 0.0), 1.0);
-    let yellow_cube_transform = Transform::from_xyz(5.0, 0.0, 0.0);
-    //let yellow_cube_physics = PhysicsBody::new(1.0);
-    let mut yellow_cube_physics = PhysicsBody::new_PhysicsBody(1.0, 
-        Vec3::new(1.0, 0.0, 0.0), 
-        Vec3::new(0.0, 0.0, 0.0), 
-        Vec3::new(5.0, 0.0, 0.0), 
-        false);
-    let yellow_entity = commands.spawn(CuboidBundle::new(yellow_cuboid, yellow_cube_mesh, yellow_cube_material, yellow_cube_transform))
-    .insert(yellow_cube_physics)
-    .id();
+    // 创建红色立方体实体
+    let red_entity = create_cuboid_entity(
+        &mut commands,
+        &mut materials,
+        &mut meshes,
+        Color::rgb(1.0, 0.0, 0.0),
+        2.0,
+        Vec3::new(0.0, 0.0, 0.0),
+        Vec3::new(-2.0, 0.0, 0.0),
+        true,
+    );
+
+
+    // 创建黄色立方体实体
+    let yellow_entity = create_cuboid_entity(
+        &mut commands,
+        &mut materials,
+        &mut meshes,
+        Color::rgb(1.0, 1.0, 0.0),
+        2.0,
+        Vec3::new(5.0, 0.0, 0.0),
+        Vec3::new(-0.0, 0.0, 0.0),
+        false,
+    );
 
     //Add DistanceJoint between red and yellow cuboids
     commands.entity(red_entity).insert(DistanceJoint {

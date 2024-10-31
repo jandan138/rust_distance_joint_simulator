@@ -9,6 +9,7 @@ mod physics;
 mod rendering;
 mod simulation;
 mod rope_constraint; 
+mod entity_creators;
 
 
 use crate::cuboid::{Cuboid, CuboidBundle};
