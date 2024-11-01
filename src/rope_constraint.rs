@@ -24,6 +24,11 @@ impl RopeConstraint {
     }
 }
 
+pub fn add_constraint(mut rope_constraints: ResMut<RopeConstraints>, new_constraint: RopeConstraint) {
+    rope_constraints.constraints.push(new_constraint);
+}
+
+
 // 维持距离约束的系统
 pub fn maintain_rope_constraints(
     mut constraints: ResMut<RopeConstraints>,

@@ -10,6 +10,7 @@ mod rendering;
 mod simulation;
 mod rope_constraint; 
 mod entity_creators;
+mod global_resources;
 
 
 use crate::cuboid::{Cuboid, CuboidBundle};
@@ -18,12 +19,15 @@ use crate::physics::{physics_step_system, PhysicsBody};
 use crate::simulation::{simulation_step_system};
 use crate::rendering::{setup_rendering_environment, update_rendering};
 use crate::rope_constraint::{RopeConstraint, RopeConstraints, maintain_rope_constraints};
+use crate::global_resources::GlobalEntities;
 
 
 
 fn main() {
     App::new()
         .insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
+        .insert_resource(RopeConstraints { constraints: Vec::new() })
+        .insert_resource(GlobalEntities { global_entities: Vec::new() })
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 title: "3D Cube Rendering".to_string(),

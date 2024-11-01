@@ -4,7 +4,7 @@ use bevy::prelude::*;
 use bevy::ecs::system::Res;
 
 // 定义重力向量，假设重力作用在Z轴负方向
-const GRAVITY: Vec3 = Vec3::new(0.0, 0.0, -9.1);
+const GRAVITY: Vec3 = Vec3::new(0.0, 0.0, -9.8);
 
 // PhysicsBody 组件存储速度、力和质量
 #[derive(Component)]

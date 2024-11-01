@@ -16,6 +16,7 @@ pub fn simulation_step_system(
         if !physics.is_fixed {
             //physics.last_position = transform.translation;
             transform.translation = physics.predicted_position;
+            physics.velocity = physics.velocity * 0.999;
         }
         else if (physics.is_fixed) {
             physics.velocity = Vec3::ZERO;

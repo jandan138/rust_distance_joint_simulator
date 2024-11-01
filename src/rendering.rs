@@ -3,14 +3,17 @@ use bevy::prelude::*;
 use crate::cuboid::{Cuboid, CuboidBundle};
 use crate::physics::PhysicsBody;
 use crate::DistanceJoint;
-use crate::rope_constraint::{RopeConstraint, RopeConstraints, maintain_rope_constraints};
+use crate::rope_constraint::{RopeConstraint, RopeConstraints, maintain_rope_constraints, add_constraint};
 use crate::entity_creators::create_cuboid_entity;
+use crate::global_resources::GlobalEntities;
 
 // Initialize the rendering environment including lights and camera
 pub fn setup_rendering_environment(
     mut commands: Commands,
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut meshes: ResMut<Assets<Mesh>>,
+    mut rope_constraints: ResMut<RopeConstraints>,
+    mut global_entities: ResMut<GlobalEntities>,
 ) {
     // Setup ambient light
     commands.insert_resource(AmbientLight {
@@ -61,6 +64,11 @@ pub fn setup_rendering_environment(
         false,
     );
 
+    // 将实体添加到全局数组中
+    //commands.insert_resource(GlobalEntities::default());
+    global_entities.global_entities.push(red_entity);
+    global_entities.global_entities.push(yellow_entity);
+
     //Add DistanceJoint between red and yellow cuboids
     commands.entity(red_entity).insert(DistanceJoint {
     body_a: red_entity,
@@ -70,7 +78,7 @@ pub fn setup_rendering_environment(
     });
 
     //加这个绳子的约束系统
-    commands.insert_resource(RopeConstraints::default());
+    //commands.insert_resource(RopeConstraints::default());
     // 创建 RopeConstraint 并添加到全局资源中
     let rope_constraint = RopeConstraint {
         body_a: red_entity,
@@ -78,10 +86,10 @@ pub fn setup_rendering_environment(
         max_distance: 5.0,
     };
     // 获取并修改 RopeConstraints 资源来添加新的绳子约束
-    commands.insert_resource(RopeConstraints {
-        constraints: vec![rope_constraint] // 这里假设 `rope_constraint` 已经创建好了
-    });
-    
+    // commands.insert_resource(RopeConstraints {
+    //     constraints: vec![rope_constraint] // 这里假设 `rope_constraint` 已经创建好了
+    // });
+    add_constraint(rope_constraints, rope_constraint);
     
 }
 
