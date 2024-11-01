@@ -64,6 +64,18 @@ pub fn setup_rendering_environment(
         false,
     );
 
+    // 创建黄色立方体实体
+    let blue_entity = create_cuboid_entity(
+        &mut commands,
+        &mut materials,
+        &mut meshes,
+        Color::rgb(0.0, 0.0, 1.0),
+        2.0,
+        Vec3::new(10.0, 0.0, 0.0),
+        Vec3::new(-0.0, 0.0, 0.0),
+        false,
+    );
+
     // 将实体添加到全局数组中
     //commands.insert_resource(GlobalEntities::default());
     global_entities.global_entities.push(red_entity);
@@ -80,16 +92,23 @@ pub fn setup_rendering_environment(
     //加这个绳子的约束系统
     //commands.insert_resource(RopeConstraints::default());
     // 创建 RopeConstraint 并添加到全局资源中
-    let rope_constraint = RopeConstraint {
+    let rope_constraint0 = RopeConstraint {
         body_a: red_entity,
         body_b: yellow_entity,
         max_distance: 5.0,
+    };
+
+    let rope_constraint1 = RopeConstraint {
+        body_a: yellow_entity,
+        body_b: blue_entity,
+        max_distance: 4.0,
     };
     // 获取并修改 RopeConstraints 资源来添加新的绳子约束
     // commands.insert_resource(RopeConstraints {
     //     constraints: vec![rope_constraint] // 这里假设 `rope_constraint` 已经创建好了
     // });
-    add_constraint(rope_constraints, rope_constraint);
+    add_constraint(&mut rope_constraints, rope_constraint0);
+    add_constraint(&mut rope_constraints, rope_constraint1);
     
 }
 
