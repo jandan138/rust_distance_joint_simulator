@@ -4,9 +4,11 @@
 https://s88jfp6fyg.feishu.cn/wiki/ZyhZwUiaCi7QxakCzrlcR7uBnsg?from=from_copylink
 
 如何编译运行
+
 1.
 rust官网下载windows rust
 https://www.rust-lang.org/zh-CN/tools/install
+
 
 2.
 选一个本地目录
